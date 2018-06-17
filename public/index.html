@@ -7,6 +7,20 @@
   <title>Node Chat App</title>
 </head>
 <body>
-  <p>Welcome to the Chat App !</p>
+  <p>Welcome to the Chat App</p>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    let socket = io();
+
+    socket.on('connect', () => {
+      console.log('Connected to the server');
+    });
+
+    socket.on('disconnect', () => {
+      console.log('Disconnected from the server');
+    });
+
+
+  </script>
 </body>
 </html>
