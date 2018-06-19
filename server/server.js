@@ -2,7 +2,9 @@
 const path = require('path');
 const http = require('http');
 const express = require('express');
-const socket = require('socket.io');
+const socketIO = require('socket.io');
+
+const {generateMessage} = require('./utils/message');
 
 const publicPath = path.join(__dirname, '../public');
 const port = process.env.PORT || 3000;
@@ -13,21 +15,29 @@ let server = http.createServer(app);
 // On passe ensuite le serveur http par socket.io dans une nouvelle variable
 // Donne accès à la librairie socket.io côté client à l'adresse /socket.io/socket.io.js
 // On passe l'url en source d'une balise script dans index.html
-let io = socket(server);
+let io = socketIO(server);
 
 app.use(express.static(publicPath));
 
 io.on('connection', (socket) => {
   console.log('New user connected');
 
-  socket.on('createMessage', (message) => {
-    console.log('Message : ', message);
+  socket.emit('newMessage', generateMessage('Admin', 'Welcome to the chat app'));
 
-    io.emit('newMessage', {
-      from: message.from,
-      text: message.text,
-      createdAt: new Date().getTime()
-    });
+  socket.broadcast.emit('newMessage', generateMessage('Admin', 'New user joined'));
+
+  socket.on('createMessage', (message) => {
+    // IO.EMIT emet un event à l'ensemble des personnes connectées au serveur
+
+    io.emit('newMessage', generateMessage(message.from, message.text));
+
+    // SOCKET.BROADCAST.EMIT emet à l'ensemble des pers. connectées sauf à l'émetteur
+
+    // socket.broadcast.emit('newMessage', {
+    //   from: message.from,
+    //   text: message.text,
+    //   createdAt: new Date().getTime()
+    // });
   });
 
   socket.on('disconnect', () => {
