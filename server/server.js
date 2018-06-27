@@ -20,16 +20,17 @@ let io = socketIO(server);
 app.use(express.static(publicPath));
 
 io.on('connection', (socket) => {
-  console.log('New user connected');
+  console.log('New user connected'); // Côté serveur
 
-  socket.emit('newMessage', generateMessage('Admin', 'Welcome to the chat app'));
+  socket.emit('newMessage', generateMessage('Admin', 'Welcome to the chat app')); // Côté client
 
-  socket.broadcast.emit('newMessage', generateMessage('Admin', 'New user joined'));
+  socket.broadcast.emit('newMessage', generateMessage('Admin', 'New user joined')); // Côté client, sauf émetteur
 
-  socket.on('createMessage', (message) => {
+  socket.on('createMessage', (message, callback) => {
     // IO.EMIT emet un event à l'ensemble des personnes connectées au serveur
 
     io.emit('newMessage', generateMessage(message.from, message.text));
+    callback('This is from the server');
 
     // SOCKET.BROADCAST.EMIT emet à l'ensemble des pers. connectées sauf à l'émetteur
 
