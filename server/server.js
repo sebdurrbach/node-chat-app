@@ -31,7 +31,7 @@ io.on('connection', (socket) => { // connection est un event standard
 
     // IO.EMIT emet un event à l'ensemble des personnes connectées au serveur
     io.emit('newMessage', generateMessage(message.from, message.text));
-    callback('This is from the server');
+    callback();
   });
 
   socket.on('createLocationMessage', (coords) => {
