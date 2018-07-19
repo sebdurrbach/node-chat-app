@@ -1,3 +1,5 @@
+// récupère l'obj renvoyé par la création de socket.io à l'adresse /socket.io/socket.io.js
+// voir server.js
 let socket = io();
 
 function scrollToBottom() {
@@ -16,11 +18,31 @@ function scrollToBottom() {
 }
 
 socket.on('connect', () => {
-  console.log('Connected to the server');
+  // deparam est une fonction ajoutée à jQuery, voir deparam.js
+  // location est une globale du navigateur, search contient les params de l'url
+  let params = $.deparam(window.location.search);
+
+  socket.emit('join', params, function(err) {
+    if (err) {
+      alert(err);
+      // href est la variable de destination de la page
+      window.location.href = '/'; // renvoie à l'index
+    } else {
+      console.log('No error');
+    }
+  });
 });
 
 socket.on('disconnect', () => {
   console.log('Disconnected from the server');
+});
+
+socket.on('updateUserList', (users) => {
+  let ol = $('<ol></ol>');
+  users.forEach((user) => {
+    ol.append($('<li></li>').text(user))
+  });
+  $('#users').html(ol);
 });
 
 socket.on('newMessage', (message) => {
